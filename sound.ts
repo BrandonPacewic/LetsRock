@@ -9,7 +9,7 @@ canvas.height = height;
 
 let soundAnalyser: AnalyserNode;
 
-const getAudio = async () => {
+async function getAudio() {
   const stream = await navigator.mediaDevices
     .getUserMedia ({ audio: true });
 
@@ -39,4 +39,6 @@ const drawTimeData = (timeData: Uint8Array) => {
   });
 };
 
-getAudio();
+(() => {
+  getAudio();
+})();

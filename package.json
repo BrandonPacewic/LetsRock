@@ -7,7 +7,7 @@
         "last 1 chrome version"
     ],
     "scripts": {
-        "start": "parcel home.html"
+        "start": "parcel index.html"
     },
     "author": "",
     "license": "ISC",
