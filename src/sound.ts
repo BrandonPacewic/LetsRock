@@ -1,26 +1,16 @@
+import { hslToRgb } from './utils.js';
+
 const width = 1500;
 const height = 1500;
 
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
 
-console.log(canvas, ctx);
-
 canvas.width = width;
 canvas.height = height;
 
 let soundAnalyser: AnalyserNode;
 let bufferLength: number;
-
-const HSLToRGB = (h: number, s: number, l: number): number[] => {
-  s /= 100;
-  l /= 100;
-  const a = s * Math.min(l, 1 - l);
-  const k = n => (n + h / 30) % 12;
-  const f = n =>
-    l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
-  return [255 * f(0), 255 * f(8), 255 * f(4)];
-};
 
 async function getAudio() {
   const stream = await navigator.mediaDevices
@@ -83,7 +73,7 @@ const drawFrequency = (frequencyData: Uint8Array) => {
     const percent = amount / 255;
     const [h, s, l] = [360 / (percent * 360) - 0.5, 0.8, 0.5];
     const barHeight = height * percent * 0.5;
-    const [r, g, b] = HSLToRGB(h, s, l);
+    const [r, g, b] = hslToRgb(h, s, l);
 
     ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
     ctx.fillRect(x, height - barHeight, barWidth, barHeight);
