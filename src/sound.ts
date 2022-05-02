@@ -18,7 +18,7 @@ async function getAudio() {
 
   const audioCtx = new AudioContext();
   soundAnalyser = audioCtx.createAnalyser();
-  const source = audioCtx.createMediaStreamSource(stream); // Typescript problem here
+  const source = audioCtx.createMediaStreamSource(stream);
   source.connect(soundAnalyser);
 
   soundAnalyser.fftSize = 2 ** 14;
@@ -32,14 +32,12 @@ async function getAudio() {
 }
 
 const drawTimeData = (timeData: Uint8Array) => {
-  // console.log(timeData);  
   soundAnalyser.getByteTimeDomainData(timeData);
 
   ctx.clearRect(0, 0, width, height);
-  // set stroke to dark blue
   ctx.lineWidth = 5;
   ctx.strokeStyle = 'rgb(0, 0, 255)';
-  ctx.shadowBlur = 10;
+  ctx.shadowBlur = 8;
   ctx.shadowColor = 'grey';
   ctx.beginPath();
   
@@ -73,13 +71,8 @@ const drawFrequency = (frequencyData: Uint8Array) => {
 
   frequencyData.forEach((amount) => {
     const percent = amount / 255;
-    // const percent = 0.005;
-    // const [h, s, l] = [360 / (percent * 360) - 0.5, 0.8, 0.5];
     const barHeight = height * percent * 0.4;
-    // const [r, g, b] = hslToRgb(h, s, l);
 
-    // ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
-    // fill style is light grey
     ctx.fillStyle = 'rgb(200, 200, 200)';
     ctx.fillRect(x, height - barHeight, barWidth, barHeight);
 
