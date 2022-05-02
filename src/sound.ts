@@ -21,7 +21,7 @@ async function getAudio() {
   const source = audioCtx.createMediaStreamSource(stream);
   source.connect(soundAnalyser);
 
-  soundAnalyser.fftSize = 2 ** 14;
+  soundAnalyser.fftSize = 2 ** 13;
   bufferLength = soundAnalyser.frequencyBinCount;
 
   const timeData = new Uint8Array(soundAnalyser.frequencyBinCount);
@@ -31,11 +31,15 @@ async function getAudio() {
   drawFrequency(frequenceData);
 }
 
+const limit = (min: number, max: number, value: number) => {
+  return Math.max(min, Math.min(max, value));
+};
+
 const drawTimeData = (timeData: Uint8Array) => {
   soundAnalyser.getByteTimeDomainData(timeData);
 
   ctx.clearRect(0, 0, width, height);
-  ctx.lineWidth = 5;
+  ctx.lineWidth = 4.5;
   ctx.strokeStyle = 'rgb(0, 0, 255)';
   ctx.shadowBlur = 8;
   ctx.shadowColor = 'grey';
@@ -45,8 +49,13 @@ const drawTimeData = (timeData: Uint8Array) => {
   let x = 0;
 
   timeData.forEach((data, i) => {
+    if (i % 6 === 0) {
+      return;
+    }
+
     const z = data / 128;
     let y = (z * height) / 2;
+    y = limit(300, height - 300, y);
 
     if (i === 0) {
       ctx.moveTo(x, y);
@@ -69,9 +78,14 @@ const drawFrequency = (frequencyData: Uint8Array) => {
   const barWidth = (width / bufferLength) * 2.5;
   let x = 0;
 
-  frequencyData.forEach((amount) => {
+  frequencyData.forEach((amount, i) => {
+    if (i % 3 !== 0 || i === 0) {
+      return;
+    }
+
     const percent = amount / 255;
-    const barHeight = height * percent * 0.4;
+    let barHeight = height * percent * 0.4;
+    barHeight = limit(0, height - 200, barHeight);
 
     ctx.fillStyle = 'rgb(200, 200, 200)';
     ctx.fillRect(x, height - barHeight, barWidth, barHeight);
