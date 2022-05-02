@@ -1,4 +1,4 @@
-import { hslToRgb } from './utils.js';
+// import { hslToRgb } from './utils.js';
 
 const width = 1500;
 const height = 1500;
@@ -14,14 +14,14 @@ let bufferLength: number;
 
 async function getAudio() {
   const stream = await navigator.mediaDevices
-    .getUserMedia ({ audio: true });
+    .getUserMedia({ audio: true });
 
   const audioCtx = new AudioContext();
   soundAnalyser = audioCtx.createAnalyser();
   const source = audioCtx.createMediaStreamSource(stream); // Typescript problem here
   source.connect(soundAnalyser);
 
-  soundAnalyser.fftSize = 2 ** 10;
+  soundAnalyser.fftSize = 2 ** 14;
   bufferLength = soundAnalyser.frequencyBinCount;
 
   const timeData = new Uint8Array(soundAnalyser.frequencyBinCount);
@@ -32,28 +32,30 @@ async function getAudio() {
 }
 
 const drawTimeData = (timeData: Uint8Array) => {
-  console.log(timeData);  
+  // console.log(timeData);  
   soundAnalyser.getByteTimeDomainData(timeData);
 
   ctx.clearRect(0, 0, width, height);
-  ctx.lineWidth = 10;
-  ctx.strokeStyle = '#ffc600'; // Yellow
+  // set stroke to dark blue
+  ctx.lineWidth = 5;
+  ctx.strokeStyle = 'rgb(0, 0, 255)';
+  ctx.shadowBlur = 10;
+  ctx.shadowColor = 'grey';
   ctx.beginPath();
-
+  
   const sliceWidth = width / bufferLength;
   let x = 0;
 
   timeData.forEach((data, i) => {
     const z = data / 128;
-    const y = (z * height) / 2;
+    let y = (z * height) / 2;
 
     if (i === 0) {
       ctx.moveTo(x, y);
-    }
-    else {
+    } else {
       ctx.lineTo(x, y);
     }
-
+    
     x += sliceWidth;
   });
 
@@ -71,11 +73,14 @@ const drawFrequency = (frequencyData: Uint8Array) => {
 
   frequencyData.forEach((amount) => {
     const percent = amount / 255;
-    const [h, s, l] = [360 / (percent * 360) - 0.5, 0.8, 0.5];
-    const barHeight = height * percent * 0.5;
-    const [r, g, b] = hslToRgb(h, s, l);
+    // const percent = 0.005;
+    // const [h, s, l] = [360 / (percent * 360) - 0.5, 0.8, 0.5];
+    const barHeight = height * percent * 0.4;
+    // const [r, g, b] = hslToRgb(h, s, l);
 
-    ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+    // ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+    // fill style is light grey
+    ctx.fillStyle = 'rgb(200, 200, 200)';
     ctx.fillRect(x, height - barHeight, barWidth, barHeight);
 
     x += barWidth + 2;
