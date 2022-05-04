@@ -84,7 +84,7 @@ const drawFrequency = (frequencyData: Uint8Array) => {
     }
 
     const percent = amount / 255;
-    let barHeight = height * percent * 0.4;
+    let barHeight = height * percent * 0.6;
     barHeight = limit(0, height - 200, barHeight);
 
     ctx.fillStyle = 'rgb(200, 200, 200)';
