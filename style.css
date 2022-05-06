@@ -1,6 +1,8 @@
 html {
-  background-color: black;
+  /* background-color: linear-gradient(slategrey, black); */
+  background: linear-gradient(#e66465, #9198e5);
   /* background-image: url('images/city.png'); */
+  /* background-color: #a9a9a9; */
   margin: 0;
 }
 
@@ -16,8 +18,8 @@ body {
   overflow: hidden;
 }
 
-/* 57% for fullscreen */
+/* TODO: Adjuest screen size for canvas */
 canvas {
-  width: 120%;
-  height: 47%; 
+  width: 115%;
+  height: 66%; 
 }
