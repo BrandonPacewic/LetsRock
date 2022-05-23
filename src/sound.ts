@@ -12,6 +12,8 @@ canvas.height = height;
 let soundAnalyser: AnalyserNode;
 let bufferLength: number;
 
+let stopSound = false;
+
 async function getAudio() {
   const stream = await navigator.mediaDevices
     .getUserMedia({ audio: true });
@@ -21,7 +23,7 @@ async function getAudio() {
   const source = audioCtx.createMediaStreamSource(stream);
   source.connect(soundAnalyser);
 
-  soundAnalyser.fftSize = 2 ** 11;
+  soundAnalyser.fftSize = 2 ** 10;
   bufferLength = soundAnalyser.frequencyBinCount;
 
   const timeData = new Uint8Array(soundAnalyser.frequencyBinCount);
@@ -37,23 +39,24 @@ const limit = (min: number, max: number, value: number) => {
 
 let timeColor = '#00ffff';
 
-const switchTimeColor = () => {
-  // cycle rgb hex colors
-  const colors = [
-    '#ff0000',
-    '#ff7f00',
-    '#ffff00',
-    '#00ff00',
-    '#00ffff',
-    '#0000ff',
-    '#7f00ff',
-    '#ff00ff',
-  ];
+const modulo = (n: number, m: number) => ((n % m) + m) % m;
 
-  timeColor = colors[Math.floor(Math.random() * colors.length)];
+const switchTimeColor = () => {
+  // randomize color
+  const [r, g, b] = [
+    modulo(Math.random() * 255, 255), 
+    modulo(Math.random() * 255, 255), 
+    modulo(Math.random() * 255, 255)];
+  
+  timeColor = `rgb(${r}, ${g}, ${b})`;
 };
 
 const drawTimeData = (timeData: Uint8Array) => {
+  if (stopSound) { 
+    ctx.clearRect(0, 0, width, height);
+    return; 
+  }
+
   soundAnalyser.getByteTimeDomainData(timeData);
 
   ctx.clearRect(0, 0, width, height);
@@ -92,10 +95,13 @@ const drawTimeData = (timeData: Uint8Array) => {
 };
 
 const drawFrequency = (frequencyData: Uint8Array) => {
+  if (stopSound) { return; }
+
   soundAnalyser.getByteFrequencyData(frequencyData);
   const barWidth = (width / bufferLength) * 2.3;
   let x = 0;
 
+  frequencyData.slice(0, 20);
   frequencyData.forEach((amount, i) => {
     if (i % 3 !== 0 || i === 0) {
       return;
@@ -116,7 +122,7 @@ const drawFrequency = (frequencyData: Uint8Array) => {
 
     ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
     // TODO
-    ctx.fillRect(x, 0, barWidth, barHeight);
+    // ctx.fillRect(x, 0, barWidth, barHeight);
     ctx.fillRect(x, height - barHeight, barWidth, barHeight);
 
     x += barWidth + 2;
@@ -137,5 +143,17 @@ document.onkeydown = (event) => {
     case "'":
       switchTimeColor();
       break;
+    case ' ':
+      if (!stopSound) {
+        stopSound = true;
+      } else {
+        stopSound = false;
+        getAudio();
+      }
+      break;
+    case ',':
+      timeColor = '#00ffff';
+      break;
+
   }
 };
