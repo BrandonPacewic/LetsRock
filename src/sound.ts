@@ -39,17 +39,14 @@ const limit = (min: number, max: number, value: number) => {
 
 let timeColor = '#00ffff';
 
-const modulo = (n: number, m: number) => ((n % m) + m) % m;
-
-const switchTimeColor = () => {
-  // randomize color
-  const [r, g, b] = [
-    modulo(Math.random() * 255, 255), 
-    modulo(Math.random() * 255, 255), 
-    modulo(Math.random() * 255, 255)];
-  
-  timeColor = `rgb(${r}, ${g}, ${b})`;
-};
+const timeColors = [
+  '#00ff00',
+  '#ff0000',
+  // white
+  '#ffffff',
+  '#0000ff',
+  '#00ffff',
+];
 
 const drawTimeData = (timeData: Uint8Array) => {
   if (stopSound) { 
@@ -60,7 +57,7 @@ const drawTimeData = (timeData: Uint8Array) => {
   soundAnalyser.getByteTimeDomainData(timeData);
 
   ctx.clearRect(0, 0, width, height);
-  ctx.lineWidth = 5;
+  ctx.lineWidth = 8;
   ctx.strokeStyle = timeColor;
   ctx.shadowBlur = 13;
   ctx.shadowColor = 'black';
@@ -94,6 +91,23 @@ const drawTimeData = (timeData: Uint8Array) => {
   });
 };
 
+let barColorFunc = (r: number, g: number, b: number) => {
+  return [r, g, b];
+};
+
+const barColorFuncs = [
+  (r: number, g: number, b: number) => {
+    return [r, g, b];
+  },
+  (r: number, g: number, b: number) => {
+    return [r, g, 0];
+  },
+  (r: number, g: number, b: number) => {
+    r = g = b = Math.max(r, g, b);
+    return [r, g, b];
+  },
+];
+
 const drawFrequency = (frequencyData: Uint8Array) => {
   if (stopSound) { return; }
 
@@ -112,17 +126,10 @@ const drawFrequency = (frequencyData: Uint8Array) => {
     barHeight = limit(0, height - 200, barHeight);
 
     const [h, s, l] = [360 / (percent * 500) - 0.5, 0.8, 0.5];
-    const [r, g, b] = hslToRgb(h, s, l);
-    // TODO
-    // let avg = ((r + b) / 2) * 1.5;
-
-    // if (avg < 128) {
-    //   avg = 0;
-    // }
+    let [r, g, b] = hslToRgb(h, s, l);
+    [r, g, b] = barColorFunc(r, g, b);
 
     ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
-    // TODO
-    // ctx.fillRect(x, 0, barWidth, barHeight);
     ctx.fillRect(x, height - barHeight, barWidth, barHeight);
 
     x += barWidth + 2;
@@ -141,7 +148,7 @@ const drawFrequency = (frequencyData: Uint8Array) => {
 document.onkeydown = (event) => {
   switch (event.key) {
     case "'":
-      switchTimeColor();
+      timeColor = timeColors[(timeColors.indexOf(timeColor) + 1) % timeColors.length];
       break;
     case ' ':
       if (!stopSound) {
@@ -154,6 +161,13 @@ document.onkeydown = (event) => {
     case ',':
       timeColor = '#00ffff';
       break;
-
+    case '.':
+      barColorFunc = barColorFuncs[(barColorFuncs.indexOf(barColorFunc) + 1) % barColorFuncs.length];
+      break;
+    case 'p':
+      barColorFunc = (r: number, g: number, b: number) => {
+        return [r, g, b];
+      }
+      break;
   }
 };
