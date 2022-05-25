@@ -1,2 +1,2 @@
 # Ensure that github detects all html
-/dist/** linguist-language=html
+/dist/*.html linguist-language=html
