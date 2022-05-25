@@ -2,13 +2,13 @@ html {
   /* background-color: linear-gradient(slategrey, black); */
   /* background: linear-gradient(#e66465, #9198e5); */
   /* background-image: url('images/Guitar\ Poster\ 1.jpg'); */
-  background-image: url('images/Guitar\ 3_4\ Band_\ Cheese\ Wheel.jpg');
+  /* background-image: url('images/Guitar\ 3_4\ Band_\ Cheese\ Wheel.jpg'); */
+  background-color: black;
   /* background-image: url('images/city.png'); */
   /* background-color: #a9a9a9; */
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
-  /* slide the background image down 20px */
   background-position-y: 0px;
   background-attachment: fixed;
 
@@ -27,8 +27,10 @@ body {
   overflow: hidden;
 }
 
-/* TODO: Adjuest screen size for canvas */
+/* Current settings are set up for the EPSON Pro LT300U THS Projector */
 canvas {
+  position: absolute;
+  top: 300px;
   width: 116%;
-  height: 50%; 
+  height: 75%; 
 }
