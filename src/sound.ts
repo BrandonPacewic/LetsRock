@@ -12,7 +12,8 @@ canvas.height = height;
 let soundAnalyser: AnalyserNode;
 let bufferLength: number;
 
-let stopSound = false;
+let stopTimeData = false;
+let stopFrequency = false;
 
 async function getAudio() {
   const stream = await navigator.mediaDevices
@@ -42,14 +43,14 @@ let timeColor = '#00ffff';
 const timeColors = [
   '#00ff00',
   '#ff0000',
-  // white
   '#ffffff',
   '#0000ff',
   '#00ffff',
+  '#ffff00',
 ];
 
 const drawTimeData = (timeData: Uint8Array) => {
-  if (stopSound) { 
+  if (stopTimeData) { 
     ctx.clearRect(0, 0, width, height);
     return; 
   }
@@ -97,23 +98,30 @@ let barColorFunc = (r: number, g: number, b: number) => {
 
 const barColorFuncs = [
   (r: number, g: number, b: number) => {
-    return [r, g, b];
-  },
-  (r: number, g: number, b: number) => {
     return [r, g, 0];
   },
   (r: number, g: number, b: number) => {
     r = g = b = Math.max(r, g, b);
     return [r, g, b];
   },
+  (r: number, g: number, b: number) => {
+    r = g = Math.max(r, g, b);
+    return [r, g, 0];
+  }
 ];
 
 const drawFrequency = (frequencyData: Uint8Array) => {
-  if (stopSound) { return; }
+  if (stopFrequency) { return; }
 
   soundAnalyser.getByteFrequencyData(frequencyData);
   const barWidth = (width / bufferLength) * 2.3;
   let x = 0;
+
+  if (stopTimeData) {
+    ctx.clearRect(0, 0, width, height);
+  }
+
+  const percentageIncrease = 0.4;
 
   frequencyData.slice(0, 20);
   frequencyData.forEach((amount, i) => {
@@ -122,7 +130,7 @@ const drawFrequency = (frequencyData: Uint8Array) => {
     }
 
     const percent = amount / 255;
-    let barHeight = height * percent * 0.4;
+    let barHeight = height * percent * (percentageIncrease + ((i - 13) * 0.0009));
     barHeight = limit(0, height - 200, barHeight);
 
     const [h, s, l] = [360 / (percent * 500) - 0.5, 0.8, 0.5];
@@ -145,18 +153,18 @@ const drawFrequency = (frequencyData: Uint8Array) => {
   getAudio();
 })();
 
+let intoImage = document.getElementById('intro-image');
+let theSelect = document.getElementById('select-logo');
+
 document.onkeydown = (event) => {
   switch (event.key) {
     case "'":
       timeColor = timeColors[(timeColors.indexOf(timeColor) + 1) % timeColors.length];
       break;
     case ' ':
-      if (!stopSound) {
-        stopSound = true;
-      } else {
-        stopSound = false;
-        getAudio();
-      }
+      stopTimeData = !stopTimeData;
+      stopFrequency = !stopFrequency;
+      getAudio();
       break;
     case ',':
       timeColor = '#00ffff';
@@ -168,6 +176,20 @@ document.onkeydown = (event) => {
       barColorFunc = (r: number, g: number, b: number) => {
         return [r, g, b];
       }
+      break;
+    case 'a':
+      stopTimeData = !stopTimeData;
+      getAudio();
+      break;
+    case 'o':
+      stopFrequency = !stopFrequency;
+      getAudio();
+      break;
+    case ';':
+      intoImage.classList.toggle('hidden');
+      break;
+    case 'q':
+      theSelect.classList.toggle('hidden');
       break;
   }
 };

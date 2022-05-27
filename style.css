@@ -1,25 +1,14 @@
 html {
-  /* background-color: linear-gradient(slategrey, black); */
-  /* background: linear-gradient(#e66465, #9198e5); */
-  /* background-image: url('images/Guitar\ Poster\ 1.jpg'); */
-  /* background-image: url('images/Guitar\ 3_4\ Band_\ Cheese\ Wheel.jpg'); */
   background-color: black;
-  /* background-image: url('images/city.png'); */
-  /* background-color: #a9a9a9; */
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
   background-position-y: 0px;
   background-attachment: fixed;
-
   margin: 0;
 }
 
 body {
-  /* background-image: url('images/henning-witzel-ukvgqriuOgo-unsplash.jpg');
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-size: cover; */
   min-height: 1vh;
   display: grid;
   grid-template-rows: 1fr;
@@ -27,10 +16,31 @@ body {
   overflow: hidden;
 }
 
+
 /* Current settings are set up for the EPSON Pro LT300U THS Projector */
 canvas {
   position: absolute;
   top: 300px;
   width: 116%;
   height: 75%; 
+}
+
+.logo {
+  position: absolute;
+  height: 50%;
+  width: 80%;
+  margin-top: 100px;
+  right: 250px;
+}
+
+.background {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-color: black;
+  opacity: 0.5;
+}
+
+.hidden {
+  display: none;
 }
